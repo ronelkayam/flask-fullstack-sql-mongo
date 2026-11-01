@@ -1,16 +1,20 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for
 import pyodbc
 from pymongo import MongoClient
+from dotenv import load_dotenv
+
+# טעינת המשתנים מקובץ ה-.env
+load_dotenv()
 
 app = Flask(__name__)
 
 # ==========================================
-# הגדרות חיבור למסדי הנתונים
+# הגדרות חיבור למסדי הנתונים (מתוך קובץ הסביבה)
 # ==========================================
 
-# חיבור ל-SQL Server באמצעות Named Pipes מקומי
-SQL_SERVER = 'np:localhost'
-SQL_DATABASE = 'fullstack_db'
+SQL_SERVER = os.getenv('SQL_SERVER', 'np:localhost')
+SQL_DATABASE = os.getenv('SQL_DATABASE', 'fullstack_db')
 
 sql_connection_str = (
     f"DRIVER={{ODBC Driver 17 for SQL Server}};"
@@ -20,8 +24,9 @@ sql_connection_str = (
     f"Encrypt=no;"
 )
 
-# חיבור ל-MongoDB עבור לוגים של פעילות משתמשים
-mongo_client = MongoClient('mongodb://localhost:27017/')
+# חיבור ל-MongoDB מתוך קובץ הסביבה
+mongo_uri = os.getenv('MONGO_URI', 'mongodb://localhost:27017/')
+mongo_client = MongoClient(mongo_uri)
 mongo_db = mongo_client['fullstack_logs_db']
 logs_collection = mongo_db['user_activity_logs']
 
